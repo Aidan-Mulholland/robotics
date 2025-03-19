@@ -1,9 +1,19 @@
+"""
+File: motors.py
+Author: CompSci Tech Team (sci.compsci.tech@mailbox.lboro.ac.uk)
+Date: 28/01/2025
+Description: Python class that passes messages based upon methods to the Yukon via serial to control the Teaching Robots V2 motors. 
+"""
+
 import serial
 import time
 
 class MotorsYukon():
     def __init__(self,port="/dev/ttyTHS1", mecanum=False):
-       
+        """
+        In
+        The robt can work with noral or mecanum wheels,
+        """
         self.port=port
         self.baudrate=115200
         self.bytesize=serial.EIGHTBITS
@@ -13,7 +23,7 @@ class MotorsYukon():
         return
 
     def connect(self):
-        # Connect to Yukon via UART 
+        # Open the connection to Yukon via UART 
         self.serial_port = serial.Serial(
             port=self.port,
             baudrate=self.baudrate,
@@ -29,12 +39,14 @@ class MotorsYukon():
         return
 
     def send(self, message):
+        #Connect - send - message and close serial
         self.connect()
         self.serial_port.write(message.encode())
         self.close()
         return
 
     def forward(self, speed=0.3):
+        # Move the robot forwards 
         message=f"m;direction:forward;speed:{speed}\n"
         self.send(message)
         return
@@ -45,6 +57,7 @@ class MotorsYukon():
         return
 
     def right(self, speed=0.3):
+        #If mecanum wheel move robot left else spin left
         if self.mecanum:
             message = f"m;direction:right;speed:{speed}\n"
         else:
@@ -70,13 +83,33 @@ class MotorsYukon():
         self.send(message)
         return
     
-    def stop(self, speed=0.0):
+    def stop(self):
+        speed=0.0
         message = f"m;direction:stop;speed:{speed}\n"
         self.send(message)
         return
 
-    #TODO Add individual motor actions eg. left front forward left front back 
-
+    #Single motor methods 
+    def frontLeft(self, speed=0.0):
+        message = f"m;direction:frontleft;speed:{speed}\n"
+        self.send(message)
+        return
+    
+    def frontRight(self, speed=0.0):
+        message = f"m;direction:frontright;speed:{speed}\n"
+        self.send(message)
+        return
+    
+    def backLeft(self, speed=0.0):
+        message = f"m;direction:backleft;speed:{speed}\n"
+        self.send(message)
+        return
+    
+    def backRight(self, speed=0.0):
+        message = f"m;direction:backright;speed:{speed}\n"
+        self.send(message)
+        return
+    
 if __name__ == "__main__":
     motorTest = MotorsYukon(mecanum=True)
     print("Forward")
